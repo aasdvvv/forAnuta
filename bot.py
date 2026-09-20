@@ -15,7 +15,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 # Токен вашего бота от @BotFather
 BOT_TOKEN = "8836621651:AAGssQCktlD8IEJp5Tb1CaiVOce98zjjkfc"
 # Прямая ссылка на PDF-файл расписания на сайте вуза
-PDF_URL = "https://fir.bsu.by/images/timetable/ILOG_timetable.pdf"
+PDF_URL = "https://for-anuta.vercel.app/api"
 # Интервал проверки обновлений в минутах
 CHECK_INTERVAL_MINUTES = 30
 
