@@ -11,7 +11,7 @@ from aiogram.client.session.aiohttp import AiohttpSession
 logging.basicConfig(level=logging.INFO)
 
 # --- КОНФИГУРАЦИЯ ---
-BOT_TOKEN = "ВСТАВЬ_СЮДА_СВОЙ_ТОКЕН"
+BOT_TOKEN = "ВАШ_ТОКЕН_ОТ_BOTFATHER"
 PDF_URL = "https://for-anuta.vercel.app/api"
 SYSTEM_PROXY = "http://proxy.server:3128"
 
@@ -19,6 +19,7 @@ session = AiohttpSession(proxy=SYSTEM_PROXY)
 bot = Bot(token=BOT_TOKEN, session=session)
 dp = Dispatcher()
 
+# 1. СНАЧАЛА ОБЪЯВЛЯЕМ ФУНКЦИЮ СКАЧИВАНИЯ И ПАРСИНГА
 async def download_and_parse_pdf():
     """Скачивает PDF с расписанием через Vercel прокси с заголовками Chrome."""
     headers = {
@@ -50,6 +51,7 @@ async def download_and_parse_pdf():
         logging.error(f"Ошибка при загрузке/парсинге PDF: {e}")
         return None
 
+# 2. ЗАТЕМ ОБЪЯВЛЯЕМ ХЭНДЛЕРЫ
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
     await message.answer("Привет! Я бот расписания ФМО. Напиши /check, чтобы получить актуальное расписание.")
@@ -63,6 +65,7 @@ async def cmd_check(message: types.Message):
     else:
         await message.answer("Не удалось загрузить или разобрать расписание.")
 
+# 3. ТОЧКА ВХОДА
 async def main():
     await bot.delete_webhook(drop_pending_updates=True)
     logging.info("Webhook успешно сброшен. Запускаем polling...")
