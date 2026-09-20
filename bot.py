@@ -61,7 +61,8 @@ async def cmd_check(message: types.Message):
         await message.answer("Не удалось загрузить расписание.")
 
 async def main():
+    # Удаляем чужой вебхук и сбрасываем накопленные сообщения
+    await bot.delete_webhook(drop_pending_updates=True)
+    
+    # Запускаем поллинг
     await dp.start_polling(bot)
-
-if __name__ == "__main__":
-    asyncio.run(main())
