@@ -10,35 +10,32 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 # Настройка логирования
 logging.basicConfig(level=logging.INFO)
 
-# Константы
-BOT_TOKEN = "8836621651:AAGssQCktlD8IEJp5Tb1CaiVOce98zjjkfc"  # Укажите ваш токен
+# КОНФИГУРАЦИЯ
+BOT_TOKEN = "8836621651:AAGssQCktlD8IEJp5Tb1CaiVOce98zjjkfc"  # Вставьте сюда ваш токен от BotFather полностью
 PDF_URL = "https://for-anuta.vercel.app/api"
 SYSTEM_PROXY = "http://proxy.server:3128"
 
-# Настройка сессии aiogram с прокси для доступа к API Telegram
+# Настройка сессии aiogram с прокси для доступа к Telegram API
 session = AiohttpSession(proxy=SYSTEM_PROXY)
 bot = Bot(token=BOT_TOKEN, session=session)
 dp = Dispatcher()
 scheduler = AsyncIOScheduler()
 
 def download_and_parse_pdf():
-    """Скачивает PDF через Vercel в обход прокси и парсит его."""
+    """Скачивает PDF через Vercel прокси с использованием системного прокси PythonAnywhere."""
     try:
-        # Отключаем системный прокси PythonAnywhere для обращения к Vercel
-        response = requests.get(
-            PDF_URL, 
-            proxies={"http": None, "https": None}, 
-            timeout=15
-        )
+        proxies = {
+            "http": SYSTEM_PROXY,
+            "https": SYSTEM_PROXY
+        }
+        response = requests.get(PDF_URL, proxies=proxies, timeout=15)
         response.raise_for_status()
         
-        # Сохраняем временный файл или обрабатываем в памяти
         with open("timetable.pdf", "wb") as f:
             f.write(response.content)
             
         logging.info("PDF успешно загружен через Vercel.")
         
-        # Пример парсинга через pdfplumber
         text = ""
         with pdfplumber.open("timetable.pdf") as pdf:
             for page in pdf.pages:
@@ -65,14 +62,10 @@ async def cmd_check(message: types.Message):
 
 async def check_schedule_updates():
     logging.info("Автоматическая проверка расписания...")
-    # Здесь ваша логика автопроверки и отправки уведомлений
 
 async def main():
-    # Запуск планировщика (например, проверка каждый час)
     scheduler.add_job(check_schedule_updates, 'interval', hours=1)
     scheduler.start()
-    
-    # Запуск бота
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
