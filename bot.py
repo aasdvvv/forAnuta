@@ -10,22 +10,22 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 logging.basicConfig(level=logging.INFO)
 
 # КОНФИГУРАЦИЯ
-BOT_TOKEN = "8836621651:AAGssQCktlD8IEJp5Tb1CaiVOce98zjjkfc"  # Укажите ваш токен от BotFather полностью
+BOT_TOKEN = "8836621651:AAGssQCktlD8IEJp5Tb1CaiVOce98zjjkfc"  # Укажите токен от BotFather
 PDF_URL = "https://for-anuta.vercel.app/api"
 SYSTEM_PROXY = "http://proxy.server:3128"
 
-# Сессия Telegram идет через прокси PythonAnywhere
+# Стандартная HTTP-сессия aiogram с поддержкой системного прокси PythonAnywhere
 session = AiohttpSession(proxy=SYSTEM_PROXY)
 bot = Bot(token=BOT_TOKEN, session=session)
 dp = Dispatcher()
 scheduler = AsyncIOScheduler()
 
 async def download_and_parse_pdf():
-    """Скачивает PDF асинхронно напрямую через aiohttp."""
+    """Скачивает PDF через Vercel прокси."""
     try:
-        # Прямой асинхронный запрос к Vercel
+        # Для запроса к Vercel прокси PythonAnywhere указывается через параметр proxy
         async with aiohttp.ClientSession() as client:
-            async with client.get(PDF_URL, timeout=15) as resp:
+            async with client.get(PDF_URL, proxy=SYSTEM_PROXY, timeout=15) as resp:
                 if resp.status != 200:
                     logging.error(f"Ошибка Vercel: статус {resp.status}")
                     return None
