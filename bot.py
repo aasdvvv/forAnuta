@@ -22,8 +22,13 @@ dp = Dispatcher()
 
 async def download_and_parse_pdf():
     """Скачивает PDF с расписанием через Vercel прокси и извлекает текст."""
+    # Заголовки, чтобы Vercel/Cloudflare не выдавал 403 Forbidden
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+    }
+    
     try:
-        async with aiohttp.ClientSession() as client:
+        async with aiohttp.ClientSession(headers=headers) as client:
             async with client.get(PDF_URL, proxy=SYSTEM_PROXY, timeout=15) as resp:
                 if resp.status != 200:
                     logging.error(f"Ошибка Vercel: статус {resp.status}")
