@@ -12,7 +12,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Константы
 BOT_TOKEN = "ВАШ_ТОКЕН_БОТА"  # Укажите ваш токен
-PDF_URL = "https://for-anuta.vercel.app/api"[cite: 10]
+PDF_URL = "https://for-anuta.vercel.app/api"
 SYSTEM_PROXY = "http://proxy.server:3128"
 
 # Настройка сессии aiogram с прокси для доступа к API Telegram
