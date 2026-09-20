@@ -1,4 +1,3 @@
-#%%
 import asyncio
 import hashlib
 import logging
@@ -8,24 +7,33 @@ from io import BytesIO
 import pdfplumber
 import requests
 from aiogram import Bot, Dispatcher, F, types
+from aiogram.client.session.aiohttp import AiohttpSession
 from aiogram.filters import CommandStart
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 # Токен вашего бота от @BotFather
-BOT_TOKEN = ("8836621651:AAGssQCktlD8IEJp5Tb1CaiVOce98zjjkfc")
+BOT_TOKEN = "8836621651:AAGssQCktlD8IEJp5Tb1CaiVOce98zjjkfc"
 # Прямая ссылка на PDF-файл расписания на сайте вуза
 PDF_URL = "https://fir.bsu.by/images/timetable/ILOG_timetable.pdf"
 # Интервал проверки обновлений в минутах
 CHECK_INTERVAL_MINUTES = 30
 
+# Настройки прокси PythonAnywhere
+PROXY_URL = "http://proxy.server:3128"
+proxies = {
+    "http": PROXY_URL,
+    "https": PROXY_URL,
+}
+
 # Временное хранилище расписания в памяти
-# Формат: {"Понедельник": "1. 08:30-10:00 - Математика\n...", ...}
 schedule_data = {}
 last_pdf_hash = ""
 subscribed_users = set()
 
-bot = Bot(token=BOT_TOKEN)
+# Инициализируем бота с использованием прокси PythonAnywhere
+session = AiohttpSession(proxy=PROXY_URL)
+bot = Bot(token=BOT_TOKEN, session=session)
 dp = Dispatcher()
 
 
@@ -34,7 +42,8 @@ def fetch_and_parse_pdf():
     global schedule_data, last_pdf_hash
 
     try:
-        response = requests.get(PDF_URL, timeout=15)
+        # Передаем прокси в requests для скачивания файла
+        response = requests.get(PDF_URL, proxies=proxies, timeout=15)
         response.raise_for_status()
         pdf_bytes = response.content
 
@@ -53,8 +62,6 @@ def fetch_and_parse_pdf():
                 tables = page.extract_tables()
                 for table in tables:
                     for row in table:
-                        # Пример базовой обработки строки таблицы
-                        # Настройте индексы колонок под структуру вашей таблицы в PDF
                         cleaned_row = [
                             cell.strip() if cell else "" for cell in row
                         ]
@@ -98,7 +105,7 @@ async def check_schedule_updates():
                 )
             except Exception as e:
                 logging.error(
-                    f"Не удалось отправки уведомление {chat_id}: {e}"
+                    f"Не удалось отправить уведомление {chat_id}: {e}"
                 )
 
 
@@ -201,4 +208,3 @@ async def main():
 
 if __name__ == "__main__":
     asyncio.run(main())
-#%%
