@@ -1,4 +1,5 @@
 print(">>> СКРИПТ НАЧАЛ ВЫПОЛНЕНИЕ...", flush=True)
+
 import logging
 import asyncio
 import aiohttp
@@ -7,19 +8,47 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.filters import Command
 from aiogram.client.session.aiohttp import AiohttpSession
 
-# Включаем логирование, чтобы видеть все действия бота в консоли
 logging.basicConfig(level=logging.INFO)
 
 # --- КОНФИГУРАЦИЯ ---
-BOT_TOKEN = "8836621651:AAEscTZES2lxYCsUZWukmZ7pKYd2JHABSN4"  # Токен от @BotFather
+BOT_TOKEN = "ВСТАВЬ_СЮДА_СВОЙ_ТОКЕН"
 PDF_URL = "https://for-anuta.vercel.app/api"
 SYSTEM_PROXY = "http://proxy.server:3128"
 
-# Настройка сессии aiogram через системный HTTP-прокси PythonAnywhere
 session = AiohttpSession(proxy=SYSTEM_PROXY)
 bot = Bot(token=BOT_TOKEN, session=session)
 dp = Dispatcher()
 
+async def download_and_parse_pdf():
+    """Скачивает PDF с расписанием через Vercel прокси с заголовками Chrome."""
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "application/pdf,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
+    }
+    
+    try:
+        async with aiohttp.ClientSession(headers=headers) as client:
+            async with client.get(PDF_URL, proxy=SYSTEM_PROXY, timeout=20) as resp:
+                if resp.status != 200:
+                    logging.error(f"Ошибка ответа Vercel: статус {resp.status}")
+                    return None
+                data = await resp.read()
+
+        with open("timetable.pdf", "wb") as f:
+            f.write(data)
+
+        text = ""
+        with pdfplumber.open("timetable.pdf") as pdf:
+            for page in pdf.pages:
+                extracted = page.extract_text()
+                if extracted:
+                    text += extracted + "\n"
+
+        return text[:1000] if text else "Текст в PDF не найден."
+
+    except Exception as e:
+        logging.error(f"Ошибка при загрузке/парсинге PDF: {e}")
+        return None
 
 @dp.message(Command("start"))
 async def cmd_start(message: types.Message):
@@ -35,11 +64,8 @@ async def cmd_check(message: types.Message):
         await message.answer("Не удалось загрузить или разобрать расписание.")
 
 async def main():
-    # 1. Принудительно сносим старый Webhook, который мог остаться от сторонних сервисов
     await bot.delete_webhook(drop_pending_updates=True)
     logging.info("Webhook успешно сброшен. Запускаем polling...")
-    
-    # 2. Запускаем получение обновлений
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
