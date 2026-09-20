@@ -1,3 +1,4 @@
+print(">>> СКРИПТ НАЧАЛ ВЫПОЛНЕНИЕ...", flush=True)
 import logging
 import asyncio
 import aiohttp
