@@ -10,7 +10,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 logging.basicConfig(level=logging.INFO)
 
 # КОНФИГУРАЦИЯ
-BOT_TOKEN = "8836621651:AA..."  # Укажите ваш токен от BotFather полностью
+BOT_TOKEN = "8836621651:AAGssQCktlD8IEJp5Tb1CaiVOce98zjjkfc"  # Укажите ваш токен от BotFather полностью
 PDF_URL = "https://for-anuta.vercel.app/api"
 SYSTEM_PROXY = "http://proxy.server:3128"
 
