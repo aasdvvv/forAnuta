@@ -13,7 +13,7 @@ from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 # Токен вашего бота от @BotFather
-BOT_TOKEN = ("for Anuta with love")
+BOT_TOKEN = ("8836621651:AAGssQCktlD8IEJp5Tb1CaiVOce98zjjkfc")
 # Прямая ссылка на PDF-файл расписания на сайте вуза
 PDF_URL = "https://fir.bsu.by/images/timetable/ILOG_timetable.pdf"
 # Интервал проверки обновлений в минутах
